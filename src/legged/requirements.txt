@@ -1,0 +1,10 @@
+defusedxml
+rospkg
+pyyaml
+catkin_pkg
+empy
+cython
+bosdyn-client
+bosdyn-mission
+bosdyn-api
+bosdyn-core

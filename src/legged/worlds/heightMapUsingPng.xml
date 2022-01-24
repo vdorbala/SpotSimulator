@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<raisim version="1.0">
+    <timeStep value="0.001"/>
+    <objects>
+<!--        <ground name="ground" body_type="static" collision_group="9223372036854775808" collision_mask="18446744073709551615">-->
+<!--            <dim height="0" />-->
+<!--        </ground>-->
+
+<!--        <heightmap name="terrain" x_sample="50" y_sample="50" x_size="20" y_size="20" center_x="0" center_y="0">-->
+<!--            <terrainProperties frequency="0.2" z_scale="3.0" fractal_octaves="3" fractal_lacunarity="2.0" fractal_gain="0.25" step_size="0" seed="0"/>-->
+<!--        </heightmap>-->
+        <heightmap name="terrain" png="[THIS_DIR]/filename.png" x_size="1081" y_size="1081" center_x="0" center_y="0" z_offset="" z_scale="1"/>
+    </objects>
+<!--    <camera follow="anymal" x="1" y="1" z="1"/>-->
+</raisim>
