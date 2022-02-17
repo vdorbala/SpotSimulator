@@ -170,7 +170,7 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
         # for file in os.listdir("./hills/"):
         #     os.remove("./hills/" + file)
 
-        NUM_HILL_TYPES = 3
+        NUM_HILL_TYPES = 1
         cnt_list = [0 for item in range(NUM_HILL_TYPES)]
 
         for i in range(HILL_NUM):
@@ -205,17 +205,17 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
 
             # Hill type - 1
             if htype == 1:
-                x_axis = np.concatenate((np.linspace(0, hill_height, int(width/2)), np.flip(np.linspace(0, hill_height, int(width/2)))))
-                y_axis = np.concatenate((np.linspace(0, hill_height, int(width/2)), np.flip(np.linspace(0, hill_height, int(width/2)))))
+                x_axis = np.linspace(-hill_height, hill_height, int(width))
+                y_axis = np.linspace(-hill_height, hill_height, int(width))
 
                 xx, yy = np.meshgrid(x_axis, y_axis)
-                hill = np.sqrt(xx ** 2 + yy ** 2)
+                hill = -np.sqrt(xx ** 2 + yy ** 2) + MAX_HILL_HEIGHT
                 cnt_list[htype-1] += 1
 
             # Hill type - 2
             elif htype == 2:
-                x_axis = np.linspace(-hill_height, hill_height, int(width))
-                y_axis = np.linspace(-hill_height, hill_height, int(width))
+                x_axis = np.concatenate((np.linspace(0, hill_height, int(width/2)), np.flip(np.linspace(0, hill_height, int(width/2)))))
+                y_axis = np.concatenate((np.linspace(0, hill_height, int(width/2)), np.flip(np.linspace(0, hill_height, int(width/2)))))
 
                 xx, yy = np.meshgrid(x_axis, y_axis)
                 hill = np.sqrt(xx ** 2 + yy ** 2)
@@ -227,7 +227,7 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
                 y_axis = np.linspace(-hill_height, hill_height, int(width))
 
                 xx, yy = np.meshgrid(x_axis, y_axis)
-                hill = -np.sqrt(xx ** 2 + yy ** 2) + MAX_HILL_HEIGHT
+                hill = np.sqrt(xx ** 2 + yy ** 2)
                 cnt_list[htype-1] += 1
 
             # Creating a plateau on the hill
@@ -315,10 +315,10 @@ if __name__ == '__main__':
 
     # Minimum and maximum width of hills
     MIN_HILL_WIDTH = 20
-    MAX_HILL_WIDTH = 40
+    MAX_HILL_WIDTH = 30
 
     # Minimum and maximum height of hills
-    MAX_HILL_HEIGHT = 15
+    MAX_HILL_HEIGHT = 20
     MIN_HILL_HEIGHT = 10
     
     # Bumpiness (frequency) of terrain
