@@ -32,7 +32,7 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
     terrainProperties = raisim.TerrainProperties()
     terrainProperties.frequency = bumpiness
     print("Bumpiness factor is {}".format(terrainProperties.frequency))
-    terrainProperties.zScale = 1.0
+    terrainProperties.zScale = 3.0
     terrainProperties.xSize = terrain_x
     terrainProperties.ySize = terrain_y
     terrainProperties.xSamples = 200
@@ -52,6 +52,7 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
     server = raisim.RaisimServer(world)
     server.launchServer(8080)
 
+    height_map = world.addHeightMap(0.0, 0.0, terrainProperties, collision_group=1, collision_mask=1)
 
     # Add Objects
     if gen_obj == True:
@@ -69,8 +70,6 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
                 circount += 1
             if  (shape2 in ['sphere', 'capsule', 'cylinder']):
                 circount += 1
-
-            print(shape1, shape2)
 
             # Setting flat shape if too many circular shapes
             if circount > (OBJ_NUM):
@@ -95,64 +94,40 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
             y = y1
             j = 0
 
-            poslist.append((x1,y1))
-            poslist.append((x2,y2))
-
-            # for shape in {shape1, shape2}:
-            #     j = j + 1
-            #     if shape == 'sphere':
-            #         actSphere = server.addVisualSphere(name = 'sph_{}{}'.format(i,j), radius = np.random.uniform(MIN_RADIUS, MAX_RADIUS))
-            #         # server.setBodyType(STATIC')
-            #         actSphere.setPosition(np.array([x, y, 5]))
-            #     elif shape == 'capsule':
-            #         actCapsule = server.addVisualCapsule(name = 'cap_{}{}'.format(i,j), length = np.random.uniform(MIN_HEIGHT, MAX_HEIGHT), radius = np.random.uniform(MIN_RADIUS, MAX_RADIUS))
-            #         actCapsule.setPosition(np.array([x, y, 5]))
-            #     elif shape == 'cylinder':
-            #         actCylinder = server.addVisualCylinder(name = 'cyl_{}{}'.format(i,j), length = np.random.uniform(MIN_HEIGHT, MAX_HEIGHT), radius = np.random.uniform(MIN_RADIUS, MAX_RADIUS))
-            #         actCylinder.setPosition(np.array([x, y, 5]))
-            #     else:
-            #         actBox = server.addVisualBox(np.random.uniform(0.5, 10), np.random.uniform(1, 10), np.random.uniform(0.5, 10))
-            #         actBox.setPosition(np.array([x, y, 100]))
-                
-            #     x = x2 
-            #     y = y2
+            poslist.extend([(x1,y1), (x2,y2)])
 
             for shape in {shape1, shape2}:
                 j = j + 1
                 if shape == 'sphere':
                     radius = np.random.uniform(MIN_RADIUS, MAX_RADIUS)
-                    actSphere = world.addSphere(radius = radius, mass = np.random.randint(MIN_MASS, MAX_MASS), collision_group=1, collision_mask=1)
+                    actSphere = world.addSphere(radius = radius, mass = np.random.randint(MIN_MASS, MAX_MASS), collision_group=1, collision_mask=63)
                     actSphere.setBodyType(raisim.BodyType(3))
                     actSphere.setPosition(np.array([x, y, 7]))
-                    poslist.append((x + abs(radius), y + abs(radius)))
-                    poslist.append((x - abs(radius), y - abs(radius)))
+                    poslist.extend([(x + abs(radius), y + abs(radius)), (x - abs(radius), y - abs(radius))])
                 elif shape == 'capsule':
                     radius = np.random.uniform(MIN_RADIUS, MAX_RADIUS)
-                    actCapsule = world.addCapsule(height = np.random.uniform(MIN_HEIGHT, MAX_HEIGHT), radius = radius, mass = np.random.randint(MIN_MASS, MAX_MASS), collision_group=1, collision_mask=1)
+                    actCapsule = world.addCapsule(height = np.random.uniform(MIN_HEIGHT, MAX_HEIGHT), radius = radius, mass = np.random.randint(MIN_MASS, MAX_MASS), collision_group=1, collision_mask=63)
                     actCapsule.setPosition(np.array([x, y, 7]))
                     actCapsule.setBodyType(raisim.BodyType(3))
 
-                    poslist.append((x + abs(radius), y + abs(radius)))
-                    poslist.append((x - abs(radius), y - abs(radius)))
+                    poslist.extend([(x + abs(radius), y + abs(radius)), (x - abs(radius), y - abs(radius))])
 
                 elif shape == 'cylinder':
                     radius = np.random.uniform(MIN_RADIUS, MAX_RADIUS)
-                    actCylinder = world.addCylinder(height = np.random.uniform(MIN_HEIGHT, MAX_HEIGHT), radius = radius, mass = np.random.randint(MIN_MASS, MAX_MASS), collision_group=1, collision_mask=1)
+                    actCylinder = world.addCylinder(height = np.random.uniform(MIN_HEIGHT, MAX_HEIGHT), radius = radius, mass = np.random.randint(MIN_MASS, MAX_MASS), collision_group=1, collision_mask=63)
                     actCylinder.setPosition(np.array([x, y, 7]))
                     actCylinder.setBodyType(raisim.BodyType(3))
 
-                    poslist.append((x + abs(radius), y + abs(radius)))
-                    poslist.append((x - abs(radius), y - abs(radius)))
+                    poslist.extend([(x + abs(radius), y + abs(radius)), (x - abs(radius), y - abs(radius))])
                 else:
                     xval = np.random.uniform(10, 30)
                     yval = np.random.uniform(10, 30)
                     zval = np.random.uniform(10, 30)
-                    actBox = world.addBox(x = xval, y = yval, z = zval, mass = np.random.randint(MIN_MASS, MAX_MASS), collision_group=1, collision_mask=1)
+                    actBox = world.addBox(x = xval, y = yval, z = zval, mass = np.random.randint(MIN_MASS, MAX_MASS), collision_group=1, collision_mask=63)
                     actBox.setPosition(np.array([x, y, 7]))
                     actBox.setBodyType(raisim.BodyType(3))
 
-                    poslist.append((x + abs(xval)/2, y + abs(yval)/2))
-                    poslist.append((x - abs(xval)/2, y - abs(yval)/2))
+                    poslist.extend([(x + abs(xval)/2, y + abs(yval)/2), (x - abs(xval)/2, y - abs(yval)/2)])
                 x = x2 
                 y = y2
 
@@ -174,8 +149,12 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
             else:
                 s2 = actBox
             
+
+            ## COMPOUND OBJECT CREATION. DOCUMENTATION IS BAD.
+
             # raisimpy.Compound(children: List[raisimpy.Compound.CompoundObjectChild], center_of_mass: float, mass: numpy.ndarray[numpy.float64], inertia: numpy.ndarray[numpy.float64])
             # compobj = world.addCompound([s1, s2], mass = np.array(np.random.randint(MIN_MASS, MAX_MASS), np.random.randint(MIN_MASS, MAX_MASS)), inertia = np.array(np.random.randint(MIN_MASS, MAX_MASS), np.random.randint(MIN_MASS, MAX_MASS)), center_of_mass=10, collision_group=1, collision_mask=1)
+            # print(dir(raisim.Compound()))
             # obj1 = raisim.SingleBodyObject(s1.getObjectType())
             # obj2 = raisim.SingleBodyObject(s2.getObjectType())
             # compobj = raisim.Compound([obj1, obj2])
@@ -183,18 +162,113 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
 
     # Add Hills
     if gen_hills == True:
-        if (os.path.isfile(os.getcwd()+'/hills/') == False):
-            os.mkdir(os.path.isfile(os.getcwd()+'/hills/'))
-        # Creating random hill files
-        for file in os.listdir("./hills/"):
-            os.remove("./hills/" + file)
+        hillpos = []
+        # if (os.path.isdir(os.getcwd()+'/hills') == False):
+        #     os.mkdir(os.getcwd()+'/hills')
+
+        # # Creating random hills
+        # for file in os.listdir("./hills/"):
+        #     os.remove("./hills/" + file)
+
+        NUM_HILL_TYPES = 3
+        cnt_list = [0 for item in range(NUM_HILL_TYPES)]
 
         for i in range(HILL_NUM):
-            hill = np.uint8(make_gradient_v2(200, 200, np.random.randint(10, 1000), np.random.randint(10, 1000), np.random.randint(50, 150), np.random.randint(50, 150), math.radians(np.random.randint(0, 90)))*np.random.randint(220, 255))
-            cv2.imwrite('./hills/hill_{}.png'.format(i), hill)
 
-    # height_map = world.addHeightMap("hmap4.png", 0, 0, terrain_x, terrain_y, 0.15, 0)
-    height_map = world.addHeightMap(0.0, 0.0, terrainProperties, collision_group=1, collision_mask=1)
+            # Generating Hills with images
+            # hill = np.uint8(make_gradient_v2(200, 200, np.random.randint(10, 1000), np.random.randint(10, 1000), np.random.randint(50, 150), np.random.randint(50, 150), math.radians(np.random.randint(0, 90)))*np.random.randint(220, 255))
+            # cv2.imwrite('./hills/hill_{}.png'.format(i), hill)
+
+            height_list = np.zeros((terrain_x, terrain_y))
+            
+            width = np.random.randint(MIN_HILL_WIDTH, MAX_HILL_WIDTH)
+            hill_start_x = np.random.randint(0, terrain_x - width-1)
+            hill_start_y = np.random.randint(0, terrain_y - width-1)
+
+            hill_start = (hill_start_x, hill_start_y)
+
+            for pos in hillpos:
+                while distance.euclidean(hill_start, pos) < MIN_INTERHILL_DIST:
+                    hill_start_x = np.random.randint(0, terrain_x - width-1)
+                    hill_start_y = np.random.randint(0, terrain_y - width-1)
+                    hill_start = (hill_start_x, hill_start_y)
+
+            htype = np.random.randint(1, NUM_HILL_TYPES+1)
+
+            while cnt_list[htype-1] >= HILL_NUM/NUM_HILL_TYPES:
+                choicelist = list(range(1, NUM_HILL_TYPES + 1))
+                choicelist.remove(htype)
+                htype = np.random.choice(choicelist)
+                        
+            hill_height = np.random.randint(MIN_HILL_HEIGHT, MAX_HILL_HEIGHT)
+
+
+            # Hill type - 1
+            if htype == 1:
+                x_axis = np.concatenate((np.linspace(0, hill_height, int(width/2)), np.flip(np.linspace(0, hill_height, int(width/2)))))
+                y_axis = np.concatenate((np.linspace(0, hill_height, int(width/2)), np.flip(np.linspace(0, hill_height, int(width/2)))))
+
+                xx, yy = np.meshgrid(x_axis, y_axis)
+                hill = np.sqrt(xx ** 2 + yy ** 2)
+                cnt_list[htype-1] += 1
+
+            # Hill type - 2
+            elif htype == 2:
+                x_axis = np.linspace(-hill_height, hill_height, int(width))
+                y_axis = np.linspace(-hill_height, hill_height, int(width))
+
+                xx, yy = np.meshgrid(x_axis, y_axis)
+                hill = np.sqrt(xx ** 2 + yy ** 2)
+                cnt_list[htype-1] += 1
+
+            # Hill type - 3
+            else:
+                x_axis = np.linspace(-hill_height, hill_height, int(width))
+                y_axis = np.linspace(-hill_height, hill_height, int(width))
+
+                xx, yy = np.meshgrid(x_axis, y_axis)
+                hill = -np.sqrt(xx ** 2 + yy ** 2) + np.random.uniform(0.7,1)*MAX_HILL_HEIGHT
+                cnt_list[htype-1] += 1
+
+            # Creating a plateau on the hill
+            plat_patch = int(np.ceil(PLAT_PERC*width))
+            
+            h1 = int((width-plat_patch)/2)
+            h2 = int((width-plat_patch)/2) + plat_patch
+            h3 = int((width-plat_patch)/2)
+            h4 = int((width-plat_patch)/2) + plat_patch
+
+            hill[h1:h2, h3:h4] = hill[h1,h3]*np.ones((plat_patch, plat_patch))
+
+            # Removing -ve values
+            hill[hill < 0] = 0
+
+
+            # Adding random noise to the hill texture
+            hill=np.random.normal(2*hill+2, np.random.uniform(0,1))
+
+            # Appending all points in the hill into list to check for distance
+            # hillpos.extend(list(zip(*np.where(hill>0))))
+            hillpos.extend([(hill_start_x, hill_start_y), (hill_start_x + width, hill_start_y), (hill_start_x, hill_start_y + width), (hill_start_x + width, hill_start_y + width)])
+
+            while True:
+                try:
+                    height_list[hill_start_x: hill_start_x + width, hill_start_y :hill_start_y + width] = hill
+                except ValueError:
+                    print("Error! Mismatch in width and plateau patch size! Changing width...")
+                    if np.shape(height_list[hill_start_x: hill_start_x + width, hill_start_y :hill_start_y + width])[0] > np.shape(hill)[0]:
+                        width -= 1
+                    else:
+                        width += 1
+                    # height_list[hill_start_x: hill_start_x + width -1, hill_start_y :hill_start_y + width - 1] = hill
+                else:
+                    break
+
+            height_map = world.addHeightMap(x_samples = terrain_x, y_samples = terrain_y, x_scale = terrain_x, y_scale = terrain_y, x_center = 0, y_center = 0, heights = list(height_list.ravel()))
+
+            # height_map = world.addHeightMap("./hills/hill_{}.png".format(i), 0, 0, terrain_x, terrain_y, 0.3, 0)
+
+    print("Number of unique hills were {}".format(cnt_list))
 
     for i in range(500000):
         time.sleep(world.getTimeStep())
@@ -221,12 +295,21 @@ if __name__ == '__main__':
     MAX_MASS = 30
 
     MIN_INTEROBJ_DIST = 50
+    MIN_INTERHILL_DIST = 25
 
-    HILL_NUM = np.random.randint(1, 10)
-    OBJ_NUM = 15
+    PLAT_PERC = np.random.uniform(0,1)
 
-    # print("Generating {} hills".format(HILL_NUM))
+    HILL_NUM = 6
+    OBJ_NUM = 10
+
+    MIN_HILL_WIDTH = 20
+    MAX_HILL_WIDTH = 40
+
+    MAX_HILL_HEIGHT = 10
+    MIN_HILL_HEIGHT = 5
+
+    print("Generating {} hills and {} objects".format(HILL_NUM, OBJ_NUM))
     bumpiness = np.random.uniform(0.1, 0.8)
 
     # world_size = (X, Y); bumpiness = 0-0.8; friction
-    generate_env(friction, bumpiness, world_size, gen_obj=True)
+    generate_env(friction, bumpiness, world_size, gen_obj = True, gen_hills = True)
