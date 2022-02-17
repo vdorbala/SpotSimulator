@@ -131,23 +131,23 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
                 x = x2 
                 y = y2
 
-            if shape1 == 'sphere':
-                s1 = actSphere
-            elif shape1 == 'capsule':
-                s1 = actCapsule
-            elif shape1 == 'cylinder':
-                s1 = actCylinder
-            else:
-                s1 = actBox
+            # if shape1 == 'sphere':
+            #     s1 = actSphere
+            # elif shape1 == 'capsule':
+            #     s1 = actCapsule
+            # elif shape1 == 'cylinder':
+            #     s1 = actCylinder
+            # else:
+            #     s1 = actBox
 
-            if shape2 == 'sphere':
-                s2 = actSphere
-            elif shape2 == 'capsule':
-                s2 = actCapsule
-            elif shape2 == 'cylinder':
-                s2 = actCylinder
-            else:
-                s2 = actBox
+            # if shape2 == 'sphere':
+            #     s2 = actSphere
+            # elif shape2 == 'capsule':
+            #     s2 = actCapsule
+            # elif shape2 == 'cylinder':
+            #     s2 = actCylinder
+            # else:
+            #     s2 = actBox
             
 
             ## COMPOUND OBJECT CREATION. DOCUMENTATION IS BAD.
@@ -227,7 +227,7 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
                 y_axis = np.linspace(-hill_height, hill_height, int(width))
 
                 xx, yy = np.meshgrid(x_axis, y_axis)
-                hill = -np.sqrt(xx ** 2 + yy ** 2) + np.random.uniform(0.7,1)*MAX_HILL_HEIGHT
+                hill = -np.sqrt(xx ** 2 + yy ** 2) + MAX_HILL_HEIGHT
                 cnt_list[htype-1] += 1
 
             # Creating a plateau on the hill
@@ -245,10 +245,12 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
 
 
             # Adding random noise to the hill texture
-            hill=np.random.normal(2*hill+2, np.random.uniform(0,1))
+            # Also adding it only on some hills
+            if htype in [1,2] and cnt_list[0]%2 == 0:
+                hill=np.random.normal(2*hill+2, HILL_NOISE)
 
             # Appending all points in the hill into list to check for distance
-            # hillpos.extend(list(zip(*np.where(hill>0))))
+            hillpos.extend(list(zip(*np.where(hill>0))))
             hillpos.extend([(hill_start_x, hill_start_y), (hill_start_x + width, hill_start_y), (hill_start_x, hill_start_y + width), (hill_start_x + width, hill_start_y + width)])
 
             while True:
@@ -268,48 +270,67 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
 
             # height_map = world.addHeightMap("./hills/hill_{}.png".format(i), 0, 0, terrain_x, terrain_y, 0.3, 0)
 
-    print("Number of unique hills were {}".format(cnt_list))
+    # print("Number of unique hills were {}".format(cnt_list))
+
+    return world, server
+
+if __name__ == '__main__':
+    
+    # Size of Terrain
+    terrain_x = 200
+    terrain_y = 200
+    world_size = (terrain_x, terrain_y)
+
+    # Types of Object shapes
+    shapelist = ['sphere', 'cylinder', 'capsule', 'box']
+
+    # Friction of surface
+    friction = 0.5
+
+    # Maximum and minimum heights of the objects
+    MIN_HEIGHT = 5
+    MAX_HEIGHT = 10
+
+    # Max and minimum radii of the objects
+    MIN_RADIUS = 5
+    MAX_RADIUS = 10
+
+    # Max and min mass of the object (DOES NOT MATTER, THEY ARE ALL STATIC = INFINITE MASS, ZERO VELOCITY)
+    MIN_MASS = 10
+    MAX_MASS = 30
+
+    # Inter object and inter hill distances
+    MIN_INTEROBJ_DIST = 60
+    MIN_INTERHILL_DIST = 25
+
+    # Perccentage of the hill that should be a plateau on the top (50% means that half of the hill from ground up will be a plateau)
+    PLAT_PERC = np.random.uniform(0,1)
+
+    # Random Gaussian Noise to add to the hill (Changes its appearance)
+    HILL_NOISE = 0.5
+
+    # Number of hills, and number of objects
+    HILL_NUM = 6
+    OBJ_NUM = 10
+
+    # Minimum and maximum width of hills
+    MIN_HILL_WIDTH = 20
+    MAX_HILL_WIDTH = 40
+
+    # Minimum and maximum height of hills
+    MAX_HILL_HEIGHT = 15
+    MIN_HILL_HEIGHT = 10
+    
+    # Bumpiness (frequency) of terrain
+    bumpiness = np.random.uniform(0.1, 0.8)
+
+    print("Generating {} hills and {} objects".format(HILL_NUM, OBJ_NUM))
+
+    ## Parameters - world_size = (X, Y); bumpiness = 0-0.8; friction
+    ## Set gen_obj for generating objects, and gen_hills for generating hills
+    world, server = generate_env(friction, bumpiness, world_size, gen_obj = True, gen_hills = True)
 
     for i in range(500000):
         time.sleep(world.getTimeStep())
 
     server.killServer()
-
-if __name__ == '__main__':
-    
-    terrain_x = 200
-    terrain_y = 200
-
-    shapelist = ['sphere', 'cylinder', 'capsule', 'box']
-
-    world_size = (terrain_x, terrain_y)
-    friction = 0.5
-
-    MAX_HEIGHT = 10
-    MAX_RADIUS = 10
-
-    MIN_HEIGHT = 5
-    MIN_RADIUS = 5
-
-    MIN_MASS = 10
-    MAX_MASS = 30
-
-    MIN_INTEROBJ_DIST = 50
-    MIN_INTERHILL_DIST = 25
-
-    PLAT_PERC = np.random.uniform(0,1)
-
-    HILL_NUM = 6
-    OBJ_NUM = 10
-
-    MIN_HILL_WIDTH = 20
-    MAX_HILL_WIDTH = 40
-
-    MAX_HILL_HEIGHT = 10
-    MIN_HILL_HEIGHT = 5
-
-    print("Generating {} hills and {} objects".format(HILL_NUM, OBJ_NUM))
-    bumpiness = np.random.uniform(0.1, 0.8)
-
-    # world_size = (X, Y); bumpiness = 0-0.8; friction
-    generate_env(friction, bumpiness, world_size, gen_obj = True, gen_hills = True)
