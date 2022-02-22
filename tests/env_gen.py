@@ -4,7 +4,7 @@ import raisimpy as raisim
 import math
 import time
 import cv2
-import pyfastnoisesimd as fns
+# import pyfastnoisesimd as fns
 from scipy.spatial import distance
 
 ## Launching Unity OpenGL
@@ -105,7 +105,6 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
                     actSphere.setBodyType(raisim.BodyType(3))
                     actSphere.setPosition(np.array([x, y, 7]))
 
-                    poslist.extend(list(zip(*np.where(actSphere>0))))
                     poslist.extend([(x + abs(radius), y + abs(radius)), (x - abs(radius), y - abs(radius))])
                 
                 elif shape == 'capsule':
@@ -114,7 +113,6 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
                     actCapsule.setPosition(np.array([x, y, 7]))
                     actCapsule.setBodyType(raisim.BodyType(3))
 
-                    poslist.extend(list(zip(*np.where(actCapsule>0))))
                     poslist.extend([(x + abs(radius), y + abs(radius)), (x - abs(radius), y - abs(radius))])
 
                 elif shape == 'cylinder':
@@ -123,7 +121,6 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
                     actCylinder.setPosition(np.array([x, y, 7]))
                     actCylinder.setBodyType(raisim.BodyType(3))
 
-                    poslist.extend(list(zip(*np.where(actCylinder>0))))
                     poslist.extend([(x + abs(radius), y + abs(radius)), (x - abs(radius), y - abs(radius))])
                 else:
                     xval = np.random.uniform(10, 30)
@@ -133,7 +130,6 @@ def generate_env(friction, bumpiness, world_size, gen_hills=False, gen_obj=False
                     actBox.setPosition(np.array([x, y, 7]))
                     actBox.setBodyType(raisim.BodyType(3))
 
-                    poslist.extend(list(zip(*np.where(actBox>0))))
                     poslist.extend([(x + abs(xval)/2, y + abs(yval)/2), (x - abs(xval)/2, y - abs(yval)/2)])
                 x = x2 
                 y = y2
@@ -296,7 +292,6 @@ def place_check(pos, radius, world):
             print(dist)
             if dist <= radius:
                 return False
-
     return True
 
 if __name__ == '__main__':
@@ -359,28 +354,30 @@ if __name__ == '__main__':
     ## Set gen_obj for generating objects, and gen_hills for generating hills
     world, server = generate_env(friction, bumpiness, world_size, gen_obj = True, gen_hills = True)
 
-    while True:
-        # time.sleep(world.getTimeStep())
-        x = np.random.randint(-terrain_x, terrain_x)
-        y = np.random.randint(-terrain_y, terrain_y)
 
-        # checkval = place_check((x,y), 60, world)
-        # print(checkval)
+    # For place check - Throws segmentation error.
+    # while True:
+    #     # time.sleep(world.getTimeStep())
+    #     x = np.random.randint(-terrain_x, terrain_x)
+    #     y = np.random.randint(-terrain_y, terrain_y)
 
-        break
+    #     # checkval = place_check((x,y), 60, world)
+    #     # print(checkval)
 
-        if checkval == True:
-            anymal = world.addArticulatedSystem("/home/vdorbala/IROS_2022/raisimlib/rsc/anymal/urdf/anymal.urdf")
-            anymal.setName("anymal")
-            anymal_nominal_joint_config = np.array([0, -1.5, 0.54, 1.0, 0.0, 0.0, 0.0, 0.03, 0.4, -0.8,
-                                                    -0.03, 0.4, -0.8, 0.03, -0.4, 0.8, -0.03, -0.4, 0.8])
-            anymal.setGeneralizedCoordinate(anymal_nominal_joint_config)
-            anymal.setPdGains(200*np.ones([18]), np.ones([18]))
-            anymal.setPdTarget(anymal_nominal_joint_config, np.zeros([18]))
-            break
+    #     break
 
-        else:
-            continue
+    #     if checkval == True:
+    #         anymal = world.addArticulatedSystem("/home/vdorbala/IROS_2022/raisimlib/rsc/anymal/urdf/anymal.urdf")
+    #         anymal.setName("anymal")
+    #         anymal_nominal_joint_config = np.array([0, -1.5, 0.54, 1.0, 0.0, 0.0, 0.0, 0.03, 0.4, -0.8,
+    #                                                 -0.03, 0.4, -0.8, 0.03, -0.4, 0.8, -0.03, -0.4, 0.8])
+    #         anymal.setGeneralizedCoordinate(anymal_nominal_joint_config)
+    #         anymal.setPdGains(200*np.ones([18]), np.ones([18]))
+    #         anymal.setPdTarget(anymal_nominal_joint_config, np.zeros([18]))
+    #         break
+
+    #     else:
+    #         continue
 
     print("outside loop")
 
