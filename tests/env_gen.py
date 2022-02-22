@@ -328,21 +328,21 @@ if __name__ == '__main__':
     MIN_INTERHILL_DIST = 25
 
     # Perccentage of the hill that should be a plateau on the top (50% means that half of the hill from ground up will be a plateau)
-    PLAT_PERC = np.random.uniform(0.1,0.2)
+    PLAT_PERC = np.random.uniform(0.1,0.3)
 
     # Random Gaussian Noise to add to the hill (Changes its appearance)
-    HILL_NOISE = 0.5
+    HILL_NOISE = 0.3
 
     # Number of hills, and number of objects
-    HILL_NUM = 6
-    OBJ_NUM = 10
+    HILL_NUM = 5
+    OBJ_NUM = 5
 
     # Minimum and maximum width of hills
     MAX_HILL_WIDTH = 51
-    MIN_HILL_WIDTH = 50
+    MIN_HILL_WIDTH = 30
 
     # Minimum and maximum height of hills
-    MAX_HILL_HEIGHT = 11
+    MAX_HILL_HEIGHT = 15
     MIN_HILL_HEIGHT = 10
     
     # Bumpiness (frequency) of terrain
@@ -378,8 +378,6 @@ if __name__ == '__main__':
 
     #     else:
     #         continue
-
-    print("outside loop")
 
     for i in range(500000):
         time.sleep(world.getTimeStep())
